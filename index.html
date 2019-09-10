@@ -11,21 +11,34 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div id="canvas"></div>
+    <canvas id="canvas"></canvas>
   </body>
   <script>
-    canvas.onclick = (e) => {
-      const div = document.createElement('div')
-      div.style.position = 'absolute'
-      div.style.left = e.clientX + 'px'
-      div.style.top = e.clientY + 'px'
-      div.style.background = 'black'
-      div.style.width = 6 + 'px'
-      div.style.height = 6 + 'px'
-      div.style.marginLeft = -3 + 'px'
-      div.style.marginTop = -3 + 'px'
-      div.style.borderRadius = '50%'
-      canvas.appendChild(div)
+    const canvas = document.querySelector('#canvas')
+    canvas.width = document.documentElement.clientWidth
+    canvas.height = document.documentElement.clientHeight
+
+    const ctx = canvas.getContext('2d')
+
+    ctx.fillStyle = 'blue'
+
+    let isDrawing = false
+
+    function drawing(e) {
+      if (isDrawing) {
+        ctx.beginPath()
+        ctx.arc(e.clientX, e.clientY, 10, 0, 2 * Math.PI)
+        ctx.fill()
+      }
+      return
     }
+
+    canvas.addEventListener('mousedown', (e) => {
+      isDrawing = true
+    })
+    canvas.addEventListener('mousemove', drawing)
+    canvas.addEventListener('mouseup', (e) => {
+      isDrawing = false
+    })
   </script>
 </html>
