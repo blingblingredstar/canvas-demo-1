@@ -14,31 +14,57 @@
     <canvas id="canvas"></canvas>
   </body>
   <script>
+    // 获取canvas
     const canvas = document.querySelector('#canvas')
     canvas.width = document.documentElement.clientWidth
     canvas.height = document.documentElement.clientHeight
-
+    // 获取绘制上下文
     const ctx = canvas.getContext('2d')
+    // 设置绘制时线的样式
+    ctx.lineWidth = 10
+    ctx.lineCap = 'round'
 
-    ctx.fillStyle = 'blue'
+    let isDrawing = false // 是否开始绘制
+    let isTouchDevice = 'ontouchstart' in document.documentElement // 是否有触摸事件
+    let lastPosition // 上次绘制坐标
 
-    let isDrawing = false
-
-    function drawing(e) {
-      if (isDrawing) {
-        ctx.beginPath()
-        ctx.arc(e.clientX, e.clientY, 10, 0, 2 * Math.PI)
-        ctx.fill()
-      }
-      return
+    // 绘制线
+    function drawLine(x1, y1, x2, y2) {
+      ctx.beginPath()
+      ctx.moveTo(x1, y1)
+      ctx.lineTo(x2, y2)
+      ctx.stroke()
     }
 
-    canvas.addEventListener('mousedown', (e) => {
-      isDrawing = true
-    })
-    canvas.addEventListener('mousemove', drawing)
-    canvas.addEventListener('mouseup', (e) => {
-      isDrawing = false
-    })
+    if (isTouchDevice) {
+      // 移动端事件
+      canvas.addEventListener('touchstart', (e) => {
+        x = e.touches[0].clientX
+        y = e.touches[0].clientY
+        lastPosition = [x, y]
+      })
+      canvas.addEventListener('touchmove', (e) => {
+        x = e.touches[0].clientX
+        y = e.touches[0].clientY
+        drawLine(lastPosition[0], lastPosition[1], x, y)
+        lastPosition = [x, y]
+      })
+    } else {
+      // pc端事件
+      canvas.addEventListener('mousedown', (e) => {
+        lastPosition = [e.clientX, e.clientY]
+        isDrawing = true
+      })
+      canvas.addEventListener('mousemove', (e) => {
+        if (isDrawing) {
+          drawLine(lastPosition[0], lastPosition[1], e.clientX, e.clientY)
+          lastPosition = [e.clientX, e.clientY]
+        }
+        return
+      })
+      canvas.addEventListener('mouseup', (e) => {
+        isDrawing = false
+      })
+    }
   </script>
 </html>
